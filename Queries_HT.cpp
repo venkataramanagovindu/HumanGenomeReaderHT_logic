@@ -2,16 +2,18 @@
 #include <iostream>
 #include <string.h>
 #include <fstream>
+#include <chrono>
+#include <bits/stdc++.h>
 
 #include "Queries_HT.h"
 
 using namespace std;
 
-Queries_HT::Queries_HT(int size) {
+Queries_HT::Queries_HT(long long int size) {
 	HashTable = new Node*[size];
     m = size;
 
-	for (long long index = 0; index < size; index++)
+	for (long long int index = 0; index < size; index++)
 		HashTable[index] = NULL;
 }
 
@@ -66,7 +68,7 @@ void Queries_HT::readFragments(string fragmentFilePath) {
     char c;
 
     int genomeQueryIdx = 0;
-    for (int i = 0; i < queriesLineCount; i++)
+    for (long long int i = 0; i < queriesLineCount; i++)
     {
         getline(fin, line);
         if (i % 2 == 0)
@@ -74,24 +76,30 @@ void Queries_HT::readFragments(string fragmentFilePath) {
 
         long long int index = this->getRadixHash(line);
 
-
-
-        if ( this->HashTable[index]->data.empty())
-        {
-            this->HashTable[index]->data = line;
+        if (this->HashTable[index] != NULL) {
+            this->numberOfCollisions++;
         }
-        else
-        {
+        
+
+        //if ( this->HashTable[index] != NULL)
+        //{
+        //    Node* newNode = new Node;
+        //    newNode->data = line;
+        //    newNode->Next = NULL;
+        //    this->HashTable[index]->Next = newNode;
+        //}
+        //else
+        //{
             Node* newNode = new Node;
             newNode->data = line;
             newNode->Next = this->HashTable[index];
             this->HashTable[index] = newNode;
-        }
+        //}
 
         //int j = 0;
         //for (; j < 32; j++) {
         //    this->genomeQueries[genomeQueryIdx][j] = line[j];
-        //}
+
         //this->genomeQueries[genomeQueryIdx][j] = '\0';
         //genomeQueryIdx++;
     }
@@ -161,9 +169,99 @@ void Queries_HT::readHumanGenomes(string genomeFilePath) {
 
     // Calculating total time taken by the program.
     double time_taken = double(end - start);
+    cout << "Human Genome Count " << totalGenomeLength << endl;
     cout << "Time taken to read the genome file : " << fixed
         << time_taken;
     cout << " sec " << endl;
+}
+
+void Queries_HT::print() {
+    cout << "numberOfCollisions " << this->numberOfCollisions<< endl;
+    //for (int i = 0; i < 1; i++)
+    //{
+    //    if (this->HashTable[i] != NULL) {
+    //        //cout << this->HashTable[i]->data << endl;
+    //        Node *node = this->HashTable[i];
+    //        while (node != NULL)
+    //        {
+    //            cout << node->data << endl;
+    //            node = node->Next;
+    //        }       
+    //    }
+    //}
+}
+
+void Queries_HT::search() {
+    char substr[17];
+    int searchPrintCount = 0;
+    for (long long int i = 0; i <= this->totalGenomeLength - this->fragmentLength; i++)
+    {
+        strncpy(substr, this->genomeArray + i, this->fragmentLength);
+        substr[fragmentLength] = '\0';
+
+        //this->findIndex(substr);
+
+        long long int radixIndex = this->getRadixHash(substr);
+
+        if (this->HashTable[radixIndex] != NULL) {
+            Node* node = this->HashTable[radixIndex];
+            while (node != NULL)
+            {
+                string s(substr);
+                //if (node->data == s) {
+                //    cout << substr << endl;
+                //    cout << node->data << endl;
+                //}
+
+                if (s == "TTCTATTCTACAACAG") {
+                    remove(node->data.begin(), node->data.end(), ' ');
+                    //if (node->data == "TTCTATTCTACAACAG") {
+                        cout << substr << endl;
+                        cout << node->data << endl;
+                    //}
+                        
+                }
+                if (s == node->data)
+                {
+                    //cout << node->data.compare(substr) << endl;
+                    if (searchPrintCount++ < 10) 
+                        cout << node->data << endl;
+
+                    this->numberOfHits++;
+                }
+
+                node = node->Next;
+            }
+        }
+    }
+
+    cout << "numberOfHits " << this->numberOfHits << endl;
+}
+
+long long int Queries_HT::findIndex(string subStr) {
+    long long int radixIndex = this->getRadixHash(subStr);
+
+    if (this->HashTable[radixIndex] != NULL) {
+        Node *node = this->HashTable[radixIndex];
+        while (node != NULL)
+        {
+            if (node->data.compare(subStr) == 0)
+            {
+                cout << node->data << endl;
+                this->numberOfHits++;
+            }
+            
+            node = node->Next;
+        }       
+    }
+    return 0;
+}
+
+Queries_HT::~Queries_HT() {
+    for (long long int i = 0; i < m; i++)
+        delete[] this->HashTable[i];
+
+    delete[] this->HashTable;
 }
 
 
