@@ -90,6 +90,9 @@ void Queries_HT::readFragments(string fragmentFilePath) {
         //}
         //else
         //{
+
+
+
             Node* newNode = new Node;
             newNode->data = line;
             newNode->Next = this->HashTable[index];
@@ -208,23 +211,35 @@ void Queries_HT::search() {
             while (node != NULL)
             {
                 string s(substr);
+                
+                remove(node->data.begin(), node->data.end(), ' ');
+                string s2(node->data);
                 //if (node->data == s) {
                 //    cout << substr << endl;
                 //    cout << node->data << endl;
                 //}
 
-                if (s == "TTCTATTCTACAACAG") {
-                    remove(node->data.begin(), node->data.end(), ' ');
-                    //if (node->data == "TTCTATTCTACAACAG") {
-                        cout << substr << endl;
-                        cout << node->data << endl;
-                    //}
-                        
-                }
-                if (s == node->data)
+                //if (s == "TTCTATTCTACAACAG") {
+                //    remove(node->data.begin(), node->data.end(), ' ');
+                //    //if (node->data == "TTCTATTCTACAACAG") {
+                //        cout << substr << endl;
+                //        cout << node->data << endl;
+                //    //}
+                //        
+                //}
+                //if (s == node->data)
+                //{
+                //    //cout << node->data.compare(substr) << endl;
+                //    if (searchPrintCount++ < 10) 
+                //        cout << node->data << endl;
+
+                //    this->numberOfHits++;
+                //}
+
+                if (s2.compare(s) == 0)
                 {
                     //cout << node->data.compare(substr) << endl;
-                    if (searchPrintCount++ < 10) 
+                    if (searchPrintCount++ < 10)
                         cout << node->data << endl;
 
                     this->numberOfHits++;
