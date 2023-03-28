@@ -14,7 +14,7 @@ class Queries_HT
 
 	public:
 		struct Node {
-			string data;
+			char *data;
 			Node *Next;
 		};
 

@@ -91,10 +91,13 @@ void Queries_HT::readFragments(string fragmentFilePath) {
         //else
         //{
 
+        char* char_array = new char[17];
+        strcpy(char_array, line.c_str());
+        char_array[16] = '\0';
 
 
             Node* newNode = new Node;
-            newNode->data = line;
+            newNode->data = char_array;
             newNode->Next = this->HashTable[index];
             this->HashTable[index] = newNode;
         //}
@@ -197,6 +200,13 @@ void Queries_HT::print() {
 void Queries_HT::search() {
     char substr[17];
     int searchPrintCount = 0;
+
+    /* Time function returns the time since the
+    Epoch(jan 1 1970). Returned time is in seconds. */
+    time_t start, end;
+    std::time(&start);
+    std::ios_base::sync_with_stdio(false);
+
     for (long long int i = 0; i <= this->totalGenomeLength - this->fragmentLength; i++)
     {
         strncpy(substr, this->genomeArray + i, this->fragmentLength);
@@ -210,9 +220,9 @@ void Queries_HT::search() {
             Node* node = this->HashTable[radixIndex];
             while (node != NULL)
             {
-                string s(substr);
-                
-                remove(node->data.begin(), node->data.end(), ' ');
+                //string s(substr);
+                //
+                //remove(node->data.begin(), node->data.end(), ' ');
                 string s2(node->data);
                 //if (node->data == s) {
                 //    cout << substr << endl;
@@ -236,13 +246,17 @@ void Queries_HT::search() {
                 //    this->numberOfHits++;
                 //}
 
-                if (s2.compare(s) == 0)
+                if (strcmp(substr, node->data) == 0)
                 {
                     //cout << node->data.compare(substr) << endl;
-                    if (searchPrintCount++ < 10)
-                        cout << node->data << endl;
+                    if (searchPrintCount++ < 10) {
+                        cout << "Index "  << i << " " << node->data << endl;
+                        
+                    }
 
                     this->numberOfHits++;
+                    node = node->Next;
+                    break;
                 }
 
                 node = node->Next;
@@ -250,6 +264,13 @@ void Queries_HT::search() {
         }
     }
 
+    time(&end);
+
+    // Calculating total time taken by the program.
+    double time_taken = double(end - start);
+    cout << "Time taken to search the queries file : " << fixed
+        << time_taken;
+    cout << " sec " << endl;
     cout << "numberOfHits " << this->numberOfHits << endl;
 }
 
@@ -260,11 +281,11 @@ long long int Queries_HT::findIndex(string subStr) {
         Node *node = this->HashTable[radixIndex];
         while (node != NULL)
         {
-            if (node->data.compare(subStr) == 0)
-            {
-                cout << node->data << endl;
-                this->numberOfHits++;
-            }
+            //if (node->data.compare(subStr) == 0)
+            //{
+            //    cout << node->data << endl;
+            //    this->numberOfHits++;
+            //}
             
             node = node->Next;
         }       
@@ -277,6 +298,7 @@ Queries_HT::~Queries_HT() {
         delete[] this->HashTable[i];
 
     delete[] this->HashTable;
+    delete[] this->genomeArray;
 }
 
 
